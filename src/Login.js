@@ -47,26 +47,48 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const response = await axios.post(LOGIN_URL,
-                JSON.stringify({ user, pwd }),
+
+        // This is what the REST API expects from us. Axios will automatically throw an error for us, so no error handling is needed 
+        // Axios will also automatically convert the response to JSON for us
+        
+            const response = await axios.post(LOGIN_URL,    # 1st parameter
+                JSON.stringify({ user, pwd }),              # 2nd parameter 
                 {
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json' },  #3rd parameter 
                     withCredentials: true
                 }
             );
-            console.log(JSON.stringify(response?.data));
+
+            console.log(JSON.stringify(response?.data));     # Inside data property of response
             //console.log(JSON.stringify(response));
-            const accessToken = response?.data?.accessToken;
-            const roles = response?.data?.roles;
-            setAuth({ user, pwd, roles, accessToken });
+
+            # The optional chaining (?.) operator access an object's properties or calls a function. If undefined or 
+            # null, the expression short circuits and evaluates to undefined instead of throwing an error
+            # Undefined is returned if the given function does not exist.
+
+            # With chained operators, JS makes sure response is not null or undefined before attempting to access the next
+            # objet. If response is null or undefined, the expression automatically short circuits, returning undefined
+            
+            const accessToken = response?.data?.accessToken;     # ? shortens if else shatement to 1 line of code. Takes 3 operands: a condition, a value that is true and a value that is false
+            const roles = response?.data?.roles;            # Roles are an array of roles we're sending back, numbers assigned to different roles
+            setAuth({ user, pwd, roles, accessToken });       
             setUser('');
             setPwd('');
             setSuccess(true);
+
+        # Error handling, if no response but have an error
+        # ! is the logical NOT operator 
+        
         } catch (err) {
+
             if (!err?.response) {
                 setErrMsg('No Server Response');
+
+                # Information expected was not received
             } else if (err.response?.status === 400) {
                 setErrMsg('Missing Username or Password');
+
+                # Unauthorized 
             } else if (err.response?.status === 401) {
                 setErrMsg('Unauthorized');
             } else {
