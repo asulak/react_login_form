@@ -2,6 +2,7 @@
 # Import hooks 
 import { useRef, useState, useEffect, useContext } from 'react';
 
+# Note this is not the same as the AuthProvider we put in index.js
 
 import AuthContext from "./context/AuthProvider";
 
@@ -9,6 +10,9 @@ import axios from './api/axios';
 const LOGIN_URL = '/auth';
 
 const Login = () => {
+
+    # If we successfully authenticate, we will store setAuth in the global context
+    
     const { setAuth } = useContext(AuthContext);
 
     # Set focus on first input when component loads
