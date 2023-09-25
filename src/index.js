@@ -4,6 +4,8 @@ import './index.css';
 import App from './App';
 import { AuthProvider } from './context/AuthProvider';
 
+# Note AuthProvider encloses the app
+
 ReactDOM.render(
   <React.StrictMode>
     <AuthProvider>
