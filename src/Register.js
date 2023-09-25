@@ -3,42 +3,66 @@ import { faCheck, faTimes, faInfoCircle } from "@fortawesome/free-solid-svg-icon
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from './api/axios';
 
-const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;
+const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;   //Must start with upper or lower case letter 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 const REGISTER_URL = '/register';
 
 const Register = () => {
+
+    # User input. Also allows us to set focus on user input when component loads
     const userRef = useRef();
+
+    # Error reference. If we get an error, we need to put focus on it so it can be announced to a screen reader
     const errRef = useRef();
 
+    # User state
     const [user, setUser] = useState('');
+
+    // Boolean. Does the name validate or not? 
     const [validName, setValidName] = useState(false);
+
+    // Boolean. Do we have focus on the input field or not?
     const [userFocus, setUserFocus] = useState(false);
 
+    # Set Password States
     const [pwd, setPwd] = useState('');
     const [validPwd, setValidPwd] = useState(false);
     const [pwdFocus, setPwdFocus] = useState(false);
 
+    # Confirm Password States
     const [matchPwd, setMatchPwd] = useState('');
     const [validMatch, setValidMatch] = useState(false);
     const [matchFocus, setMatchFocus] = useState(false);
 
+    // State if submission fails 
     const [errMsg, setErrMsg] = useState('');
+
+    // State if submission succeeds
     const [success, setSuccess] = useState(false);
 
+    // Sets focus when component loads. There's nothing in the dependency array, so this will only happen when the 
+    // component loads. It will set focus on the username input; to do so, we'll have to reference the user input 
+    
     useEffect(() => {
         userRef.current.focus();
     }, [])
+
+    // We validate the username here. Notice the user state in the dependency array; any time it changes, it will check the validation
+    // of that field. 
 
     useEffect(() => {
         setValidName(USER_REGEX.test(user));
     }, [user])
 
+    // We validate the password here. 
+    
     useEffect(() => {
         setValidPwd(PWD_REGEX.test(pwd));
-        setValidMatch(pwd === matchPwd);
+        setValidMatch(pwd === matchPwd);     # Returns a boolean
     }, [pwd, matchPwd])
 
+    // Error message use effect. Any time user changes one of three states, we clear out the error message
+    
     useEffect(() => {
         setErrMsg('');
     }, [user, pwd, matchPwd])
@@ -91,7 +115,14 @@ const Register = () => {
                 </section>
             ) : (
                 <section>
+                
+                // Displays error message if exists. Paragraph displayed at top of form. We've got our errorRef created with useref.
+                // If the error message exists, errMsg is the error message state and we apply the class "errmsg", otherwise applies the class "offscreen".
+                // When we set focus on element, it will be announced with screen reader. The errMsg will display inside
+                
                     <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
+
+            
                     <h1>Register</h1>
                     <form onSubmit={handleSubmit}>
                         <label htmlFor="username">
