@@ -5,7 +5,7 @@ import axios from './api/axios';
 
 const USER_REGEX = /^[A-z][A-z0-9-_]{3,23}$/;   //Must start with upper or lower case letter 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
-const REGISTER_URL = '/register';
+const REGISTER_URL = '/register';    // End point for registration in back end API 
 
 const Register = () => {
 
@@ -78,13 +78,17 @@ const Register = () => {
             return;     // We don't submit anything to database
         }
         try {
-            const response = await axios.post(REGISTER_URL,
-                JSON.stringify({ user, pwd }),
-                {
-                    headers: { 'Content-Type': 'application/json' },
+            const response = await axios.post(REGISTER_URL,   //Endpoint URL 
+                JSON.stringify({ user, pwd }),   // Payload, data we're sending. We destructure 2 properties. Our backend expects a property name user and pwd  
+                {                               //Object
+                    headers: { 'Content-Type': 'application/json' }
                     withCredentials: true
                 }
             );
+
+        //With Axios, and unlike fetch, you don't have to manually change the response to JSON - it already happens 
+        // We'll await access token
+        
             // TODO: remove console.logs before deployment
             console.log(JSON.stringify(response?.data));
             //console.log(JSON.stringify(response))
@@ -93,15 +97,15 @@ const Register = () => {
             setUser('');
             setPwd('');
             setMatchPwd('');
-        } catch (err) {
-            if (!err?.response) {
+        } catch (err) {    // Standard error messages 
+            if (!err?.response) {     // If no error response. Maybe we lost internet connection 
                 setErrMsg('No Server Response');
-            } else if (err.response?.status === 409) {
+            } else if (err.response?.status === 409) {     // User name we've tried to submit is taken
                 setErrMsg('Username Taken');
             } else {
                 setErrMsg('Registration Failed')
             }
-            errRef.current.focus();
+            errRef.current.focus();    // Set focus on error message 
         }
     }
 
