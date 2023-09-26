@@ -54,7 +54,7 @@ const Register = () => {
         setValidName(USER_REGEX.test(user));
     }, [user])
 
-    // We validate the password here. 
+    // We validate the password here and keep track of pwd and matchPwd states
     
     useEffect(() => {
         setValidPwd(PWD_REGEX.test(pwd));
@@ -67,6 +67,7 @@ const Register = () => {
         setErrMsg('');
     }, [user, pwd, matchPwd])
 
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
         // if button enabled with JS hack
@@ -74,7 +75,7 @@ const Register = () => {
         const v2 = PWD_REGEX.test(pwd);
         if (!v1 || !v2) {
             setErrMsg("Invalid Entry");
-            return;
+            return;     // We don't submit anything to database
         }
         try {
             const response = await axios.post(REGISTER_URL,
@@ -121,28 +122,45 @@ const Register = () => {
                 // When we set focus on element, it will be announced with screen reader. The errMsg will display inside
                 
                     <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errMsg}</p>
-
             
                     <h1>Register</h1>
+
+                    // Function that submits form
+    
                     <form onSubmit={handleSubmit}>
+
+                    //ID for username input
                         <label htmlFor="username">
                             Username:
-                            <FontAwesomeIcon icon={faCheck} className={validName ? "valid" : "hide"} />
-                            <FontAwesomeIcon icon={faTimes} className={validName || !user ? "hide" : "invalid"} />
+
+                    // If valid username, apply class valid, otherwise, we'll hide icon
+
+                            <span className={validName ? "valid" : "hide"}>
+                                <FontAwesomeIcon icon={faCheck}/>
+
+                    // Red X icon. If we have validName and user field is empty, hide red x. 
+
+                            <span className={validName || !user ? "hide" : "invalid"}>
+                                <FontAwesomeIcon icon={faTimes}/>
+            
                         </label>
                         <input
                             type="text"
                             id="username"
-                            ref={userRef}
+                            ref={userRef}      //Sets focus on input
                             autoComplete="off"
-                            onChange={(e) => setUser(e.target.value)}
+                            onChange={(e) => setUser(e.target.value)}   //Provides event then sets user state
                             value={user}
-                            required
-                            aria-invalid={validName ? "false" : "true"}
-                            aria-describedby="uidnote"
+                            required      // INput is required
+                            aria-invalid={validName ? "false" : "true"}    //If valid username, set to false
+                            aria-describedby="uidnote"       // Provide element that describes input field
                             onFocus={() => setUserFocus(true)}
-                            onBlur={() => setUserFocus(false)}
+                            onBlur={() => setUserFocus(false)}    // When we leave input field
                         />
+
+                        // If user focus is true and user state exists (not empty) and there is not valid user name, display instructions. Otherwise, 
+                        // directions are taken offscreen
+                                
                         <p id="uidnote" className={userFocus && user && !validName ? "instructions" : "offscreen"}>
                             <FontAwesomeIcon icon={faInfoCircle} />
                             4 to 24 characters.<br />
@@ -150,6 +168,7 @@ const Register = () => {
                             Letters, numbers, underscores, hyphens allowed.
                         </p>
 
+                        // || is OR operator, && And
 
                         <label htmlFor="password">
                             Password:
@@ -157,14 +176,14 @@ const Register = () => {
                             <FontAwesomeIcon icon={faTimes} className={validPwd || !pwd ? "hide" : "invalid"} />
                         </label>
                         <input
-                            type="password"
-                            id="password"
-                            onChange={(e) => setPwd(e.target.value)}
+                            type="password"       //Will not support autocomplete setting
+                            id="password"        // No useref, do not want to set focus on field when page loads
+                            onChange={(e) => setPwd(e.target.value)}    //Set password state 
                             value={pwd}
                             required
                             aria-invalid={validPwd ? "false" : "true"}
-                            aria-describedby="pwdnote"
-                            onFocus={() => setPwdFocus(true)}
+                            aria-describedby="pwdnote" 
+                            onFocus={() => setPwdFocus(true)}   //On focus and on blur tell us if we are in field 
                             onBlur={() => setPwdFocus(false)}
                         />
                         <p id="pwdnote" className={pwdFocus && !validPwd ? "instructions" : "offscreen"}>
@@ -195,6 +214,8 @@ const Register = () => {
                             <FontAwesomeIcon icon={faInfoCircle} />
                             Must match the first password input field.
                         </p>
+
+                        // Submit button. Since there's only 1 button, we don't need to provide type submit
 
                         <button disabled={!validName || !validPwd || !validMatch ? true : false}>Sign Up</button>
                     </form>
